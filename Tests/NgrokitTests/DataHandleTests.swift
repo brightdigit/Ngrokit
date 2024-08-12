@@ -1,6 +1,6 @@
 //
-//  Pipable.swift
-//  Ngrokit
+//  DataHandleTests.swift
+//  Sublimation
 //
 //  Created by Leo Dion.
 //  Copyright © 2024 BrightDigit.
@@ -27,20 +27,14 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
+@testable import Ngrokit
+import NgrokitMocks
+import XCTest
 
-/// A protocol for types that can be piped.
-///
-/// Types conforming to this protocol must also conform to `Sendable`.
-///
-/// - Note: The associated type `DataHandleType` must conform to `DataHandle`.
-///
-/// - Important: The `fileHandleForReading` property
-/// must be implemented to provide a handle for reading data.
-public protocol Pipable: Sendable {
-  /// The associated type representing the data handle.
-  associatedtype DataHandleType: DataHandle
-
-  /// The file handle used for reading data.
-  var fileHandleForReading: DataHandleType { get }
+internal class DataHandleTests: XCTestCase {
+  internal func testParseNgrokErrorCode() throws {
+    let dataHandle = MockDataHandle.withNgrokCode()
+    let error = try dataHandle.parseNgrokErrorCode()
+    XCTAssertEqual(error.rawValue, 108)
+  }
 }

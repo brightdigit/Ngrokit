@@ -1,6 +1,6 @@
 //
-//  Pipable.swift
-//  Ngrokit
+//  NgrokProcessCLIAPITests.swift
+//  Sublimation
 //
 //  Created by Leo Dion.
 //  Copyright © 2024 BrightDigit.
@@ -27,20 +27,27 @@
 //  OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import Foundation
+@testable import Ngrokit
+import NgrokitMocks
+import XCTest
 
-/// A protocol for types that can be piped.
-///
-/// Types conforming to this protocol must also conform to `Sendable`.
-///
-/// - Note: The associated type `DataHandleType` must conform to `DataHandle`.
-///
-/// - Important: The `fileHandleForReading` property
-/// must be implemented to provide a handle for reading data.
-public protocol Pipable: Sendable {
-  /// The associated type representing the data handle.
-  associatedtype DataHandleType: DataHandle
+internal class NgrokProcessCLIAPITests: XCTestCase {
+  internal func testProcess() async throws {
+    let ngrokPath = UUID().uuidString
+    let httpPort = Int.random(in: 10 ... 10_000)
+    let api = NgrokProcessCLIAPI<MockProcess>(ngrokPath: ngrokPath)
+    let process = api.process(forHTTPPort: httpPort)
 
-  /// The file handle used for reading data.
-  var fileHandleForReading: DataHandleType { get }
+    let macProcess = process as? NgrokMacProcess<MockProcess>
+
+    XCTAssertNotNil(macProcess)
+
+    let mockProcess = await macProcess?.process
+
+    XCTAssertNotNil(mockProcess)
+
+    XCTAssertEqual(mockProcess?.executableFilePath, ngrokPath)
+    XCTAssertEqual(mockProcess?.port, httpPort)
+    XCTAssertEqual(mockProcess?.scheme, "http")
+  }
 }
